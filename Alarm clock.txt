@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alarm Clock App</title>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Mobile-Sized Container */
+    .app-container {
+      background-color: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      width: 320px;
+      height: 500px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background-color: #333;
+      color: white;
+      border-radius: 15px;
+    }
+
+    .navbar div {
+      font-size: 14px;
+    }
+
+    /* Simulated Phone Status Bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 10px;
+      background-color: #222;
+      color: white;
+      border-radius: 10px;
+      font-size: 14px;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .status-bar .network,
+    .status-bar .battery,
+    .status-bar .time-mobile {
+      display: flex;
+      align-items: center;
+    }
+
+    .network:before {
+      content: "📶";
+      margin-right: 5px;
+    }
+
+    .battery:before {
+      content: "🔋";
+      margin-right: 5px;
+    }
+
+    .time-mobile:before {
+      content: "🕑";
+      margin-right: 5px;
+    }
+
+    /* Time Display */
+    .time {
+      font-size: 48px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 60px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .date {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    /* Buttons */
+    .button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .button:hover {
+      background-color: #45a049;
+    }
+
+    .button:active {
+      background-color: #388e3c;
+    }
+
+    /* Alarm Settings */
+    .alarm-settings {
+      margin-top: 20px;
+      display: none;
+      text-align: center;
+    }
+
+    .alarm-settings input[type="time"] {
+      padding: 5px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .alarm-settings button {
+      padding: 10px 15px;
+      background-color: #FF5722;
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .alarm-settings button:hover {
+      background-color: #e64a19;
+    }
+
+    /* Display alarms */
+    .alarms-list {
+      margin-top: 30px;
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .alarms-list li {
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .alarms-list button {
+      background-color: #2196F3;
+      border: none;
+      color: white;
+      border-radius: 25px;
+      padding: 5px 15px;
+      cursor: pointer;
+    }
+
+    .alarms-list button:hover {
+      background-color: #1976D2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Simulated Phone Status Bar -->
+  <div class="status-bar">
+    <div class="network">LTE</div>
+    <div class="battery">85%</div>
+    <div class="time-mobile" id="mobile-time">12:00 PM</div>
+  </div>
+
+  <!-- App Container -->
+  <div class="app-container">
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+      <div>Alarm Clock</div>
+      <div>Battery: 85%</div>
+    </div>
+
+    <!-- Time and Date Display -->
+    <div class="time" id="time-display">12:00:00</div>
+    <div class="date" id="date-display">Friday, 20 December 2024</div>
+
+    <!-- Set Alarm Button -->
+    <button class="button" id="set-alarm-btn">Set Alarm</button>
+
+    <!-- Alarm Settings Form -->
+    <div class="alarm-settings" id="alarm-settings">
+      <input type="time" id="alarm-time" />
+      <button id="save-alarm-btn">Save Alarm</button>
+    </div>
+
+    <!-- Displaying List of Set Alarms -->
+    <ul class="alarms-list" id="alarms-list"></ul>
+  </div>
+
+  <script>
+    // Function to display the current time and date
+    function updateTime() {
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      const date = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      document.getElementById('time-display').textContent = time;
+      document.getElementById('date-display').textContent = date;
+
+      const mobileTime = now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+      document.getElementById('mobile-time').textContent = mobileTime;
+    }
+
+    // Update the time every second
+    setInterval(updateTime, 1000);
+
+    // Toggle the alarm settings form
+    const setAlarmBtn = document.getElementById('set-alarm-btn');
+    const alarmSettings = document.getElementById('alarm-settings');
+    setAlarmBtn.addEventListener('click', () => {
+      alarmSettings.style.display = alarmSettings.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Save the alarm time and display it in the list
+    const saveAlarmBtn = document.getElementById('save-alarm-btn');
+    const alarmsList = document.getElementById('alarms-list');
+
+    saveAlarmBtn.addEventListener('click', () => {
+      const alarmTime = document.getElementById('alarm-time').value;
+
+      if (alarmTime) {
+        const alarmItem = document.createElement('li');
+        alarmItem.innerHTML = ${alarmTime} <button class="button">Snooze</button> <button class="button">Dismiss</button>;
+        alarmsList.appendChild(alarmItem);
+
+        // Clear the input field and hide the settings form
+        document.getElementById('alarm-time').value = '';
+        alarmSettings.style.display = 'none';
+      }
+    });
+  </script>
+
+</body>
+</html>
